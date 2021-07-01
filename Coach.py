@@ -1,9 +1,12 @@
+from tqdm import tqdm
+
 from Utils import gen_epsilon_greedy_policy, get_features
 from agents import epsilon_really_greedy_agent
 
+
 def q_learning(env, estimator, memory, mode, n_episode, replay_size, target_update=10, gamma=1.0, epsilon=0.1, epsilon_decay=.999):
     total_reward_episode = [0] * n_episode
-    for episode in range(n_episode):
+    for episode in tqdm(range(n_episode), desc='Training', leave=False):
         if episode % target_update == 0:
             estimator.copy_target()
         policy = gen_epsilon_greedy_policy(estimator, epsilon, 4)
