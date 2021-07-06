@@ -2,9 +2,10 @@ from tqdm import tqdm
 
 from Utils import gen_epsilon_greedy_policy, get_features
 from agents import epsilon_really_greedy_agent
+from replay_memory import ReplayMemory
 
 
-def q_learning(env, estimator, memory, mode, n_episode, replay_size, target_update=10, gamma=1.0, epsilon=0.1, epsilon_decay=.999):
+def q_learning(env, estimator, memory: ReplayMemory, mode, n_episode, replay_size, target_update=10, gamma=1.0, epsilon=0.1, epsilon_decay=.999):
     total_reward_episode = [0] * n_episode
     for episode in tqdm(range(n_episode), desc='Training', leave=False):
         if episode % target_update == 0:
@@ -67,15 +68,16 @@ def q_learning(env, estimator, memory, mode, n_episode, replay_size, target_upda
             if is_done:
                 if memory_flag:
                     for mem in local_memory:
-                        memory.append(mem)
+                        memory.push(ReplayMemory.MAXIMAL_PRIORITY, mem)
                 local_memory = []
                 memory_flag = False
                 break
-            estimator.replay(memory, replay_size, gamma)
-                
+
             state = next_state
             prev_obs = observation
             #old_action = action
+
+        estimator.replay(memory, replay_size, gamma)
         if episode % 100 == 0:
             print('Эпизод: {}, полное вознаграждение: {}, максимальная длина: {}, число шагов: {}, epsilon:{}'.format(
             episode, total_reward_episode[episode], max_length, steps, epsilon))
