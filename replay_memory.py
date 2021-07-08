@@ -1,15 +1,11 @@
-from collections import namedtuple
 import random
 import numpy as np
 import math
 from sum_tree import SumTree
 
-# Transition = namedtuple('Transition',
-#                         ('state', 'action', 'next_state', 'reward'))
-
 
 class ReplayMemory(object):
-    MAXIMAL_PRIORITY = 1000
+    MAXIMAL_PRIORITY = 100
 
     def __init__(self, capacity):
         self.sum_tree = SumTree(capacity)
@@ -35,10 +31,7 @@ class ReplayMemory(object):
 
     def update_priorities(self, idx_list, priorities):
         for i in range(len(idx_list)):
-            self._update(idx_list[i], priorities[i])
-
-    def _update(self, idx, p):
-        self.sum_tree.update(idx, p)
+            self.sum_tree.update(idx_list[i], priorities[i])
 
 
 # В оригинальной статье Prioritized Experience Replay работают с одним приоритетом и для него одного вычисляется
@@ -65,3 +58,4 @@ def annealing_parameter(replay_memory, priority, beta):
     prob = priority / replay_memory.sum_tree.total()
     omega = math.pow(1 / N / prob, beta)
     return omega
+
